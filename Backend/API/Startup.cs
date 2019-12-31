@@ -1,4 +1,8 @@
-﻿using Database;
+﻿using CompanyEventManagement.Middlewares.GraphQL;
+using Database;
+using GraphQL;
+using GraphQL.Http;
+using GraphQL.Server.Ui.Playground;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Features;
@@ -7,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Schema;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 
@@ -50,6 +55,16 @@ namespace CompanyEventManagement
             // Add application services.
             services.AddSingleton(Configuration);
 
+            // GraphQL related
+            services.AddTransient<IDependencyResolver>(serviceProvider =>
+            {
+                return new FuncDependencyResolver(serviceProvider.GetService);
+            });
+            services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
+            services.AddSingleton<IDocumentWriter, DocumentWriter>();
+            services.AddTransient<QueryType>();
+            services.AddTransient<EventSchema>();
+
             services.Configure<HstsOptions>(options =>
             {
                 options.IncludeSubDomains = true;
@@ -89,6 +104,9 @@ namespace CompanyEventManagement
             app.UseCookiePolicy();
             app.UseSession();
             app.UseAuthentication();
+
+            app.UseGraphQL<EventSchema>();
+            app.UseGraphQLPlayground(new GraphQLPlaygroundOptions());
 
             using (var serviceScope = app.ApplicationServices
                .GetRequiredService<IServiceScopeFactory>()
