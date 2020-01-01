@@ -1,8 +1,7 @@
 ﻿using System;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace CompanyEventManagement.Migrations
+namespace CompanyEventManagement.Persistence.Migrations
 {
     public partial class Update001 : Migration
     {
@@ -13,9 +12,10 @@ namespace CompanyEventManagement.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(nullable: true),
                     EmailAddress = table.Column<string>(nullable: true),
+                    Position = table.Column<string>(type: "nvarchar(24)", nullable: false),
                     CreatedOn = table.Column<DateTime>(nullable: false),
                     EventId = table.Column<int>(nullable: true)
                 },
@@ -29,7 +29,7 @@ namespace CompanyEventManagement.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(nullable: true),
                     ShortDescription = table.Column<string>(nullable: true),
                     FullDescription = table.Column<string>(nullable: true),

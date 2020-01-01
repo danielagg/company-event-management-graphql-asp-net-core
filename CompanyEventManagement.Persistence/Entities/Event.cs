@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Database.Entities
+namespace CompanyEventManagement.Persistence.Entities
 {
     public class Event
     {
