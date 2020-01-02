@@ -2,9 +2,7 @@
 using CompanyEventManagement.Persistence;
 using GraphQL.Types;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace CompanyEventManagement.GraphQL
 {
@@ -12,14 +10,57 @@ namespace CompanyEventManagement.GraphQL
     {
         public MainQuery(AppDbContext dbContext)
         {
-             FieldAsync<ListGraphType<Types.UserType>>("users",
+            CreateUserQueries(dbContext);
+            CreateEventQueries(dbContext);
+        }
+
+        #region users
+
+        private void CreateUserQueries(AppDbContext dbContext)
+        {
+            FieldAsync<ListGraphType<UserType>>("users",
                 resolve: async _ => await dbContext.Users.ToListAsync());
 
             FieldAsync<UserType>("user",
                 arguments: new QueryArguments(
-                    new QueryArgument<NonNullGraphType<IntGraphType>>() { Name = "id", Description = "User id" }),
-                resolve: async context => await dbContext.Users
-                .FirstOrDefaultAsync(u => u.Id == context.GetArgument<int>("id", 0)));
+                    new QueryArgument<NonNullGraphType<IntGraphType>>()
+                    {
+                        Name = "id",
+                        Description = "User id"
+                    }),
+                resolve: async context => await FindEntityById(context, dbContext.Users));
         }
+
+        #endregion
+
+        #region events
+
+        private void CreateEventQueries(AppDbContext dbContext)
+        {
+            FieldAsync<ListGraphType<EventType>>("events",
+                resolve: async _ => await dbContext.Events.ToListAsync());
+
+            FieldAsync<EventType>("event",
+               arguments: new QueryArguments(
+                   new QueryArgument<NonNullGraphType<IntGraphType>>()
+                   {
+                       Name = "id",
+                       Description = "Event id"
+                   }),
+               resolve: async context => await FindEntityById(context, dbContext.Events));
+        }
+
+        #endregion
+
+        #region utils
+
+        private async Task<T> FindEntityById<T>(ResolveFieldContext<object> context, DbSet<T> dbSet)
+            where T : class, EntityWithId
+        {
+            return await dbSet
+                .FirstOrDefaultAsync(u => u.Id == context.GetArgument<int>("id", 0));
+        }
+
+        #endregion
     }
 }

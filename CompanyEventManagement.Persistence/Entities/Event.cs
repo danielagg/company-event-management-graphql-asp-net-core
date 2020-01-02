@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CompanyEventManagement.Persistence.Entities
 {
-    public class Event
+    public class Event : EntityWithId
     {
         public int Id { get; set; }
         public string Title { get; set; }

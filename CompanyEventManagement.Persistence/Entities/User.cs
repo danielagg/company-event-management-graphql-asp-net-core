@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CompanyEventManagement.Persistence.Entities
 {
-    public class User
+    public class User : EntityWithId
     {
         public int Id { get; set; }
         public string Name { get; set; }

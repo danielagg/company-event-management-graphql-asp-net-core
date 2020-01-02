@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CompanyEventManagement.Persistence.Entities
 {
-    public class EventAttendee
+    public class EventAttendee : EntityWithId
     {
         public int Id { get; set; }
         public int EventId { get; set; }
