@@ -1,9 +1,7 @@
 using CompanyEventManagement.GraphQL;
 using CompanyEventManagement.Persistence;
-using GraphQL;
 using GraphQL.Server;
 using GraphQL.Server.Ui.Playground;
-using GraphQL.Types;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Features;
@@ -50,9 +48,6 @@ namespace CompanyEventManagement.API
 
             services.AddSingleton(Configuration);
 
-            // GraphQL related
-            
-
             services.Configure<HstsOptions>(options =>
             {
                 options.IncludeSubDomains = true;
@@ -75,15 +70,6 @@ namespace CompanyEventManagement.API
                     }));
 
             services.SetupGraphQL();
-
-            services.AddGraphQL(_ =>
-            {
-                _.EnableMetrics = true;
-                _.ExposeExceptions = true;
-            }).AddGraphTypes(ServiceLifetime.Scoped);
-
-            services.AddTransient<IDependencyResolver>(sp => new FuncDependencyResolver(sp.GetRequiredService));
-            services.AddTransient<ISchema>(sp => new MainSchema(new FuncDependencyResolver(type => sp.GetService(type))));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

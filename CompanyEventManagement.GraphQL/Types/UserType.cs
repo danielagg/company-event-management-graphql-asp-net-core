@@ -1,33 +1,41 @@
 ﻿using CompanyEventManagement.Persistence;
 using CompanyEventManagement.Persistence.Entities;
 using GraphQL.Types;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace CompanyEventManagement.GraphQL.Types
 {
     public class UserType : ObjectGraphType<User>
     {
+        private readonly AppDbContext dbContext;
+
         public UserType(AppDbContext dbContext)
         {
+            this.dbContext = dbContext;
+
             Field(x => x.Id);
             Field(x => x.Name);
             Field(x => x.EmailAddress);
             Field<UserPositionEnumType>("Position");
             Field(x => x.CreatedOn);
 
-            //FieldAsync<ListGraphType<OrderType>>("orders",
-            //  resolve: async context => await dbContext.Orders.Where(order => order.UserId == context.Source.Id).ToListAsync());
+            FieldAsync<ListGraphType<EventType>>("events",
+              resolve: async context => await ResolveUserAttendingEvents(context));             
         }
-    }
 
-    public class UserPositionEnumType : EnumerationGraphType<UserPositionType>
-    {
-        public UserPositionEnumType()
+        private async Task<List<Event>> ResolveUserAttendingEvents(ResolveFieldContext<User> context)
         {
-            Name = "Position";
-            Description = "Enumeration for the position.";
+            var events = await dbContext.Attendees
+                .Where(a => a.UserId == context.Source.Id)
+                .Select(a => a.Event)
+                .ToListAsync();
+
+            return events;
         }
     }
 }
