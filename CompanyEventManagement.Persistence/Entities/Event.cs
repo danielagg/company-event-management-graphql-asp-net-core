@@ -15,7 +15,6 @@ namespace CompanyEventManagement.Persistence.Entities
         public virtual User OrganizerUser { get; set; }
         public int ModifiedByUserId { get; set; }
         public virtual User ModifiedByUser { get; set; }
-        public virtual List<User> Attendees { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime ModifiedOn { get; set; }
     }

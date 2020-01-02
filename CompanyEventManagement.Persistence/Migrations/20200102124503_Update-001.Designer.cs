@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CompanyEventManagement.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20200101162917_Update-002")]
-    partial class Update002
+    [Migration("20200102124503_Update-001")]
+    partial class Update001
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -61,6 +61,34 @@ namespace CompanyEventManagement.Persistence.Migrations
                     b.ToTable("Events");
                 });
 
+            modelBuilder.Entity("CompanyEventManagement.Persistence.Entities.EventAttendee", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsCancelled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("JoinedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Attendees");
+                });
+
             modelBuilder.Entity("CompanyEventManagement.Persistence.Entities.User", b =>
                 {
                     b.Property<int>("Id")
@@ -74,9 +102,6 @@ namespace CompanyEventManagement.Persistence.Migrations
                     b.Property<string>("EmailAddress")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("EventId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
@@ -85,8 +110,6 @@ namespace CompanyEventManagement.Persistence.Migrations
                         .HasColumnType("nvarchar(24)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("EventId");
 
                     b.ToTable("Users");
 
@@ -132,12 +155,19 @@ namespace CompanyEventManagement.Persistence.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("CompanyEventManagement.Persistence.Entities.User", b =>
+            modelBuilder.Entity("CompanyEventManagement.Persistence.Entities.EventAttendee", b =>
                 {
-                    b.HasOne("CompanyEventManagement.Persistence.Entities.Event", null)
-                        .WithMany("Attendees")
+                    b.HasOne("CompanyEventManagement.Persistence.Entities.Event", "Event")
+                        .WithMany()
                         .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CompanyEventManagement.Persistence.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

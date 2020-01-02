@@ -16,8 +16,7 @@ namespace CompanyEventManagement.Persistence.Migrations
                     Name = table.Column<string>(nullable: true),
                     EmailAddress = table.Column<string>(nullable: true),
                     Position = table.Column<string>(type: "nvarchar(24)", nullable: false),
-                    CreatedOn = table.Column<DateTime>(nullable: false),
-                    EventId = table.Column<int>(nullable: true)
+                    CreatedOn = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -56,6 +55,59 @@ namespace CompanyEventManagement.Persistence.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Attendees",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    EventId = table.Column<int>(nullable: false),
+                    UserId = table.Column<int>(nullable: false),
+                    IsCancelled = table.Column<bool>(nullable: false),
+                    JoinedOn = table.Column<DateTime>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Attendees", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Attendees_Events_EventId",
+                        column: x => x.EventId,
+                        principalTable: "Events",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Attendees_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "Id", "CreatedOn", "EmailAddress", "Name", "Position" },
+                values: new object[] { 1, new DateTime(2019, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "dan@org.com", "Daniel Agg", "Developer" });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "Id", "CreatedOn", "EmailAddress", "Name", "Position" },
+                values: new object[] { 2, new DateTime(2019, 2, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), "pete@org.com", "Peter Smith", "Manager" });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "Id", "CreatedOn", "EmailAddress", "Name", "Position" },
+                values: new object[] { 3, new DateTime(2019, 5, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), "jackie@org.com", "Jackie Taylor", "SysAdmin" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Attendees_EventId",
+                table: "Attendees",
+                column: "EventId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Attendees_UserId",
+                table: "Attendees",
+                column: "UserId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_Events_ModifiedByUserId",
                 table: "Events",
@@ -65,36 +117,18 @@ namespace CompanyEventManagement.Persistence.Migrations
                 name: "IX_Events_OrganizerUserId",
                 table: "Events",
                 column: "OrganizerUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Users_EventId",
-                table: "Users",
-                column: "EventId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Users_Events_EventId",
-                table: "Users",
-                column: "EventId",
-                principalTable: "Events",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Events_Users_ModifiedByUserId",
-                table: "Events");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Events_Users_OrganizerUserId",
-                table: "Events");
-
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "Attendees");
 
             migrationBuilder.DropTable(
                 name: "Events");
+
+            migrationBuilder.DropTable(
+                name: "Users");
         }
     }
 }
