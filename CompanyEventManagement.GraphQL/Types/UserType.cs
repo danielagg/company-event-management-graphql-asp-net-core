@@ -14,20 +14,20 @@ namespace CompanyEventManagement.GraphQL.Types
             Field(x => x.Id);
             Field(x => x.Name);
             Field(x => x.EmailAddress);
-            //Field<UserPositionEnumType>("Position");
+            Field<UserPositionEnumType>("Position");
             Field(x => x.CreatedOn);
 
             //FieldAsync<ListGraphType<OrderType>>("orders",
             //  resolve: async context => await dbContext.Orders.Where(order => order.UserId == context.Source.Id).ToListAsync());
         }
+    }
 
-        public class UserPositionEnumType : EnumerationGraphType<UserPositionType>
+    public class UserPositionEnumType : EnumerationGraphType<UserPositionType>
+    {
+        public UserPositionEnumType()
         {
-            public UserPositionEnumType()
-            {
-                Name = "Position";
-                Description = "Enumeration for the position.";
-            }
+            Name = "Position";
+            Description = "Enumeration for the position.";
         }
     }
 }

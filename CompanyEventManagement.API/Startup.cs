@@ -1,9 +1,9 @@
 using CompanyEventManagement.GraphQL;
-using CompanyEventManagement.GraphQL.Types;
 using CompanyEventManagement.Persistence;
 using GraphQL;
 using GraphQL.Server;
 using GraphQL.Server.Ui.Playground;
+using GraphQL.Types;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Features;
@@ -61,7 +61,7 @@ namespace CompanyEventManagement.API
 
             services.AddHttpClient();
 
-            services.AddMvc();
+            services.AddMvc(s => s.EnableEndpointRouting = false);
 
             var databaseConnectionString = "Server=(localdb)\\mssqllocaldb;Database=company-event-management-db;Trusted_Connection=True;ConnectRetryCount=0"; // todo, move to secure vault
 
@@ -74,15 +74,16 @@ namespace CompanyEventManagement.API
                         builder.CommandTimeout((int)TimeSpan.FromMinutes(5).TotalSeconds);
                     }));
 
+            services.SetupGraphQL();
+
+            services.AddGraphQL(_ =>
+            {
+                _.EnableMetrics = true;
+                _.ExposeExceptions = true;
+            }).AddGraphTypes(ServiceLifetime.Scoped);
+
             services.AddTransient<IDependencyResolver>(sp => new FuncDependencyResolver(sp.GetRequiredService));
-            services.AddTransient<MainSchema>();
-            services.AddTransient<MainQuery>();
-            services.AddTransient<MainMutation>();
-            services.AddTransient<UserType>();
-
-            services.AddGraphQL(options => options.ExposeExceptions = true)
-                .AddGraphTypes(ServiceLifetime.Scoped);
-
+            services.AddTransient<ISchema>(sp => new MainSchema(new FuncDependencyResolver(type => sp.GetService(type))));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -104,6 +105,7 @@ namespace CompanyEventManagement.API
 
             app.UseGraphQL<MainSchema>();
             app.UseGraphQLPlayground(new GraphQLPlaygroundOptions());
+            app.UseMvc();
 
 
             using var serviceScope = app.ApplicationServices
