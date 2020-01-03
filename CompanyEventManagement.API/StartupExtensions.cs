@@ -21,7 +21,8 @@ namespace CompanyEventManagement.API
                 .AddTransient<MainMutation>()
                 .AddTransient<UserType>()
                 .AddTransient<UserPositionEnumType>()
-                .AddTransient<EventType>();
+                .AddTransient<EventType>()
+                .AddTransient<EventAttendeeType>();
         }
 
         public static void SetupGraphQL(this IServiceCollection services)

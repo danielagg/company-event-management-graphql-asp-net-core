@@ -2,6 +2,7 @@
 using CompanyEventManagement.Persistence;
 using GraphQL.Types;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace CompanyEventManagement.GraphQL
@@ -29,6 +30,18 @@ namespace CompanyEventManagement.GraphQL
                         Description = "User id"
                     }),
                 resolve: async context => await FindEntityById(context, dbContext.Users));
+
+            FieldAsync<ListGraphType<UserType>>("eventAttendes",
+               arguments: new QueryArguments(
+                   new QueryArgument<NonNullGraphType<IntGraphType>>()
+                   {
+                       Name = "eventId",
+                       Description = "Event id"
+                   }),
+               resolve: async context => await dbContext.Attendees
+                .Where(a => a.EventId == context.GetArgument<int>("eventId", 0))
+                .Select(a => a.User)
+                .ToListAsync());
         }
 
         #endregion
