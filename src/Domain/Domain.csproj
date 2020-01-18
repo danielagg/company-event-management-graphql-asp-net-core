@@ -1,0 +1,9 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <RootNamespace>company_event_management.Domain</RootNamespace>
+    <AssemblyName>company_event_management.Domain</AssemblyName>
+  </PropertyGroup>
+
+</Project>
